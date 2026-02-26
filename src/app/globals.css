@@ -1,36 +1,308 @@
 @import "tailwindcss";
 
+/* =============================================
+   RED BULL PREMIUM DESIGN SYSTEM
+   ============================================= */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --font-display: var(--font-barlow);
+  --font-body: var(--font-inter-tight);
 }
 
+/* =============================================
+   CSS Custom Properties
+   ============================================= */
 :root {
-  --background: #0D1112;
+  --background: #08090a;
   --foreground: #ffffff;
+  --rb-red: #E8102E;
+  --rb-red-dark: #9b0c1e;
+  --rb-red-glow: rgba(232, 16, 46, 0.6);
+  --rb-red-subtle: rgba(232, 16, 46, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --surface-1: rgba(255, 255, 255, 0.04);
+  --surface-2: rgba(255, 255, 255, 0.07);
+  --text-muted: rgba(255, 255, 255, 0.38);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-primary: rgba(255, 255, 255, 0.92);
+  --noise-url: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* =============================================
+   Keyframe Animations
+   ============================================= */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    top: -2px;
+  }
+
+  100% {
+    top: 100%;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(60px) skewY(4deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0px) skewY(0deg);
+  }
+}
+
+@keyframes border-glow-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(232, 16, 46, 0);
+  }
+
+  50% {
+    box-shadow: 0 0 0 4px rgba(232, 16, 46, 0.35);
+  }
+}
+
+@keyframes particle-drift {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.7;
+  }
+
+  80% {
+    opacity: 0.3;
+  }
+
+  100% {
+    transform: translateY(-300px) translateX(60px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes count-up-glow {
+  0% {
+    text-shadow: 0 0 0px rgba(232, 16, 46, 0);
+  }
+
+  50% {
+    text-shadow: 0 0 40px rgba(232, 16, 46, 0.6);
+  }
+
+  100% {
+    text-shadow: 0 0 20px rgba(232, 16, 46, 0.3);
+  }
+}
+
+/* =============================================
+   Base Reset & Typography
+   ============================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: var(--font-inter-tight, 'Inter Tight', sans-serif);
   overflow-x: hidden;
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Custom Selection: Red Bull Red */
+/* Premium Selection */
 ::selection {
-  background-color: #ED1A3A;
-  color: #ffffff;
+  background-color: var(--rb-red);
+  color: #fff;
 }
 
-/* Hide scrollbar completely for cinematic feel */
+/* Hidden scrollbar — cinematic */
 ::-webkit-scrollbar {
   display: none;
 }
 
 body {
   -ms-overflow-style: none;
-  /* IE and Edge */
   scrollbar-width: none;
-  /* Firefox */
+}
+
+/* =============================================
+   Utility Classes
+   ============================================= */
+
+/* Grain overlay applied via pseudo — add class="grain" to any element */
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--noise-url);
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Shimmer gradient text */
+.text-shimmer {
+  background: linear-gradient(120deg, #fff 0%, #fff 40%, #ED1A3A 50%, #fff 60%, #fff 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Marquee */
+.marquee-track {
+  animation: marquee 24s linear infinite;
+  will-change: transform;
+}
+
+/* Scan line */
+.scan-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--rb-red), transparent);
+  animation: scan-line 3s ease-in-out infinite;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* Float animation */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Pulse glow */
+.animate-pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+/* Reveal */
+.animate-reveal-up {
+  animation: reveal-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Border glow pulse */
+.animate-border-glow {
+  animation: border-glow-pulse 2s ease-in-out infinite;
+}
+
+/* Red glow text */
+.glow-text-red {
+  text-shadow: 0 0 30px rgba(232, 16, 46, 0.5), 0 0 60px rgba(232, 16, 46, 0.25);
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Premium button base */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  background: var(--rb-red);
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+  transform: translateX(-100%) skewX(-15deg);
+  transition: transform 0.5s ease;
+}
+
+.btn-primary:hover::before {
+  transform: translateX(200%) skewX(-15deg);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 50px rgba(232, 16, 46, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }

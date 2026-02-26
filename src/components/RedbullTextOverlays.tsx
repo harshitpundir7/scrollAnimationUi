@@ -1,114 +1,197 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { useRef } from "react";
 
+// -------------------------------------------------------
+// Section data
+// -------------------------------------------------------
+const sections = [
+    {
+        eyebrow: "Formula",
+        title: "VITALIZES",
+        subtitle: "BODY & MIND.",
+        body: "A unique blend of premium ingredients — taurine, B-vitamins, caffeine and real sugars — precision crafted to unlock your peak potential.",
+        stat: { value: "80mg", label: "Caffeine per can" },
+        position: "left",
+        range: [0.02, 0.1, 0.2] as [number, number, number],
+        accent: true,
+    },
+    {
+        eyebrow: "Momentum",
+        title: "WINGS WHEN",
+        subtitle: "YOU NEED THEM.",
+        body: "Whether you're chasing a summit, a deadline, or a podium — Red Bull delivers the sustained energy to carry you further.",
+        stat: { value: "12.7B", label: "Cans sold in 2023" },
+        position: "right",
+        range: [0.25, 0.35, 0.45] as [number, number, number],
+        accent: false,
+    },
+    {
+        eyebrow: "Excellence",
+        title: "PERFORMANCE",
+        subtitle: "UNLEASHED.",
+        body: "From Formula 1 circuits to freefall from space — Red Bull powers the moments that redefine what's humanly possible.",
+        stat: { value: "600+", label: "Athletes sponsored" },
+        position: "center",
+        range: [0.52, 0.63, 0.73] as [number, number, number],
+        accent: true,
+    },
+    {
+        eyebrow: "Vision",
+        title: "THE FUTURE",
+        subtitle: "OF ENERGY.",
+        body: "Innovation never stops. Red Bull continuously pushes boundaries in science, sport, and sustainability — for a world without limits.",
+        stat: { value: "175+", label: "Countries worldwide" },
+        position: "center",
+        range: [0.8, 0.9, 1.0] as [number, number, number],
+        accent: false,
+    },
+];
+
+// -------------------------------------------------------
+// Main component
+// -------------------------------------------------------
 export default function RedbullTextOverlays() {
     const containerRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,
-        offset: ["start start", "end end"]
+        offset: ["start start", "end end"],
     });
-
-    const sections = [
-        {
-            title: "VITALIZES BODY",
-            subtitle: "AND MIND.",
-            position: "left",
-            range: [0.03, 0.1, 0.2]
-        },
-        {
-            title: "WINGS WHEN",
-            subtitle: "YOU NEED THEM.",
-            position: "right",
-            range: [0.25, 0.35, 0.45]
-        },
-        {
-            title: "PERFORMANCE",
-            subtitle: "UNLEASHED.",
-            position: "center",
-            range: [0.55, 0.65, 0.75]
-        },
-        {
-            title: "THE FUTURE OF",
-            subtitle: "ENERGY.",
-            position: "center",
-            range: [0.8, 0.9, 1.0]
-        },
-    ];
 
     return (
         <div ref={containerRef} className="absolute inset-0 h-[800vh] w-full pointer-events-none z-10">
-            {sections.map((section, idx) => {
-                return (
-                    <TextOverlay
-                        key={idx}
-                        title={section.title}
-                        subtitle={section.subtitle}
-                        position={section.position}
-                        range={section.range}
-                        progress={scrollYProgress}
-                    />
-                );
-            })}
+            {sections.map((section, idx) => (
+                <TextOverlay key={idx} {...section} progress={scrollYProgress} />
+            ))}
         </div>
     );
 }
 
-function TextOverlay({ title, subtitle, position, range, progress }: any) {
+// -------------------------------------------------------
+// Single text overlay
+// -------------------------------------------------------
+interface OverlayProps {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    body: string;
+    stat: { value: string; label: string };
+    position: string;
+    range: [number, number, number];
+    progress: MotionValue<number>;
+    accent: boolean;
+}
+
+function TextOverlay({ eyebrow, title, subtitle, body, stat, position, range, progress, accent }: OverlayProps) {
     const [start, peak, end] = range;
 
     const opacity = useTransform(
         progress,
-        [start, start + 0.05, peak, end - 0.05, end],
-        [0, 1, 1, 0, 0]
+        [start, start + 0.05, peak, end - 0.06, end],
+        [0, 1, 1, 1, 0]
     );
+    const y = useTransform(progress, [start, peak, end], [80, 0, -60]);
+    const scale = useTransform(progress, [start, peak, end], [0.92, 1, 1.06]);
 
-    const y = useTransform(
-        progress,
-        [start, peak, end],
-        [100, 0, -100]
-    );
-
-    const scale = useTransform(
-        progress,
-        [start, peak, end],
-        [0.8, 1, 1.2]
-    );
-
-    let alignmentClass = "items-center text-center justify-center";
-    if (position === "left") alignmentClass = "items-start text-left justify-center pl-8 md:pl-24";
-    if (position === "right") alignmentClass = "items-end text-right justify-center pr-8 md:pr-24";
+    let outerClass = "fixed inset-0 flex flex-col justify-center px-6 sm:px-12 lg:px-24";
+    let innerClass = "max-w-lg";
+    if (position === "right") {
+        outerClass += " items-end";
+        innerClass += " text-right";
+    } else if (position === "center") {
+        outerClass += " items-center text-center";
+        innerClass += " text-center";
+    } else {
+        outerClass += " items-start";
+    }
 
     return (
-        <motion.div
-            style={{ opacity, y, scale }}
-            className={`fixed inset-0 flex flex-col ${alignmentClass}`}
-        >
-            <div className="relative group">
+        <motion.div style={{ opacity, y, scale }} className={outerClass}>
+            <div className={innerClass}>
+                {/* Eyebrow */}
+                <motion.p
+                    className="text-[0.65rem] tracking-[0.45em] uppercase font-bold text-[#E8102E] mb-4"
+                    style={{ fontFamily: "var(--font-inter-tight)" }}
+                >
+                    — {eyebrow}
+                </motion.p>
+
+                {/* Main title (hollow stroke) */}
                 <h2
-                    className="text-6xl sm:text-7xl md:text-9xl lg:text-[11rem] font-black tracking-tighter uppercase italic leading-[0.85] mix-blend-screen text-transparent"
-                    style={{ WebkitTextStroke: '2px rgba(255,255,255,0.15)' }}
+                    className="font-black uppercase italic leading-[0.82] mb-1"
+                    style={{
+                        fontFamily: "var(--font-barlow)",
+                        fontSize: "clamp(3.5rem, 10vw, 10rem)",
+                        WebkitTextStroke: "2px rgba(255,255,255,1)",
+                        color: "rgba(255, 255, 255, 0.4)",
+                        filter: "drop-shadow(0 0 15px rgba(255,255,255,0.2))"
+                    }}
                 >
                     {title}
                 </h2>
-                {/* Glow behind the stroke */}
-                <h2 className="absolute top-0 left-0 text-6xl sm:text-7xl md:text-9xl lg:text-[11rem] font-black tracking-tighter uppercase italic leading-[0.85] blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-1000 text-white mix-blend-overlay">
-                    {title}
-                </h2>
-            </div>
 
-            {subtitle && (
-                <div className="relative mt-2">
-                    <h2 className="text-6xl sm:text-7xl md:text-9xl lg:text-[12rem] font-black tracking-tighter uppercase italic leading-[0.85] text-transparent bg-clip-text bg-gradient-to-br from-[#ED1A3A] via-[#ff4a63] to-[#800a1b] drop-shadow-[0_20px_40px_rgba(237,26,58,0.4)] relative z-10">
+                {/* Subtitle (red gradient fill) */}
+                <h2
+                    className="font-black uppercase italic leading-[0.82] mb-8 relative"
+                    style={{
+                        fontFamily: "var(--font-barlow)",
+                        fontSize: "clamp(3.5rem, 10vw, 10rem)",
+                    }}
+                >
+                    {/* Red gradient */}
+                    <span
+                        className="relative z-10"
+                        style={{
+                            background: accent
+                                ? "linear-gradient(135deg, #E8102E 0%, #ff4a63 50%, #c00020 100%)"
+                                : "linear-gradient(135deg, #ffffff 0%, #cccccc 100%)",
+                            WebkitBackgroundClip: "text",
+                            backgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            filter: accent ? "drop-shadow(0 0 30px rgba(232,16,46,0.45))" : "none",
+                        }}
+                    >
                         {subtitle}
-                    </h2>
-                    {/* Intense Red Glow */}
-                    <h2 className="absolute top-0 left-0 text-6xl sm:text-7xl md:text-9xl lg:text-[12rem] font-black tracking-tighter uppercase italic leading-[0.85] text-[#ED1A3A] blur-3xl opacity-50 mix-blend-screen z-0">
-                        {subtitle}
-                    </h2>
+                    </span>
+                    {/* Blur glow layer */}
+                    {accent && (
+                        <span
+                            aria-hidden
+                            className="absolute inset-0 font-black uppercase italic leading-[0.82] text-[#E8102E] blur-2xl opacity-40 select-none"
+                            style={{ fontFamily: "var(--font-barlow)", fontSize: "clamp(3.5rem, 10vw, 10rem)" }}
+                        >
+                            {subtitle}
+                        </span>
+                    )}
+                </h2>
+
+                {/* Body text */}
+                <p
+                    className="text-white/50 text-sm leading-relaxed mb-8 max-w-xs"
+                    style={{ fontFamily: "var(--font-inter-tight)", ...(position === "center" && { margin: "0 auto 2rem" }) }}
+                >
+                    {body}
+                </p>
+
+                {/* Stat chip */}
+                <div
+                    className={`inline-flex items-center gap-4 glass-card px-5 py-3 ${position === "center" ? "mx-auto" : ""}`}
+                >
+                    <span
+                        className="text-3xl font-black text-[#E8102E] leading-none"
+                        style={{ fontFamily: "var(--font-barlow)" }}
+                    >
+                        {stat.value}
+                    </span>
+                    <span
+                        className="text-[10px] tracking-[0.25em] uppercase text-white/40 leading-tight"
+                        style={{ fontFamily: "var(--font-inter-tight)" }}
+                    >
+                        {stat.label}
+                    </span>
                 </div>
-            )}
+            </div>
         </motion.div>
     );
 }
